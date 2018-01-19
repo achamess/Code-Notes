@@ -153,6 +153,16 @@ res <- df %>% mutate(category=cut(a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("lo
 
 ## Summary Statistics
 
+### `summarize()` from `dplyr`
+
+```{r summarize with dplyr, eval=TRUE, echo=TRUE}
+mpg_summary <- mpg %>%
+  group_by(class) %>% # group by grouping variable class
+  summarize(hwy_sd = sd(hwy), hwy_mean = mean(hwy)) %>% # find the sd and se of the mean
+  mutate(hwy_se = hwy_sd/sqrt(length(mpg$hwy))) # add the standard error of the mean
+```
+
+
 ### `summaryBy` (Base R)
 ```{r summaryBy}
 summaryBy(Age ~ med_year, data = data, FUN = function(x) { c(m = mean(x, na.rm=TRUE), s = sd(x, na.rm=TRUE), n =length(x), r=range(x,na.rm=TRUE)) }
