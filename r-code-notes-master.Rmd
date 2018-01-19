@@ -9,12 +9,11 @@ output:
 tags= #r_code #ggplot2 #data_science 
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',eval=FALSE, warning=FALSE, message=FALSE, echo=TRUE)
+knitr::opts_chunk$set(fig.width=12, fig.height=8,eval=TRUE, warning=FALSE, message=FALSE, echo=TRUE)
 ```
 
 ```{r}
 library(tidyverse)
-
 ```
 
 # Getting and Writing Data
@@ -22,7 +21,7 @@ library(tidyverse)
 ## Importing Data
 
 ### Tab Delimited Text
-``` {r import table delimited text}
+``` {r import table delimited text, eval=FALSE, echo=TRUE}
 mydata <- read.delim("my_data.txt", header=TRUE, na.strings="NA")
 ```
 
@@ -30,7 +29,7 @@ mydata <- read.delim("my_data.txt", header=TRUE, na.strings="NA")
 
 [Stack Overflow - Importing Multiple CSV files in R](http://stackoverflow.com/questions/11433432/importing-multiple-csv-files-into-r)
 
-```{r}
+```{r eval=FALSE, echo=TRUE}
 temp = list.files(pattern="*.csv")
 for (i in 1:length(temp)) assign(temp[i], read.csv(temp[i]))   
 ```
@@ -39,7 +38,7 @@ for (i in 1:length(temp)) assign(temp[i], read.csv(temp[i]))
 
 ### Write out a tab delimited text
 	
-``` {r}
+``` {r, eval=FALSE, echo=TRUE}
 #tab delimitted text file
 write.table(my_data, "my_data_output", sep="\t")
 ```	
@@ -57,7 +56,7 @@ write.table(my_data, "my_data_output", sep="\t")
 ](https://stackoverflow.com/questions/6286313/remove-an-entire-column-from-a-data-frame-in-r)
 
 Remove a column
-```{r}
+```{r eval=FALSE, echo=TRUE}
 > Data$genome <- NULL
 > head(Data)
    chr region
@@ -70,7 +69,7 @@ Remove a column
 ```
 
 Remove multiple columns
-```{r}
+```{r, eval=FALSE, echo=TRUE}
 Data[1:2] <- list(NULL)  # Marek
 Data[1:2] <- NULL        # does not work!
 ```
@@ -78,7 +77,7 @@ Data[1:2] <- NULL        # does not work!
 ### Add columns to data frame 
 
 [Adding a New Column to a Data Frame](https://lembra.wordpress.com/2010/03/12/adding-new-column-to-a-data-frame-in-r/)
-```{r Create Empty Column in df}
+```{r, Create Empty Column in df, eval=FALSE, echo=TRUE}
 
 df["MY_NEW_COLUMN"] <- NA # That creates the new column named "MY_NEW_COLUMN" filled with "NA"
 df[c("E","F","G","H","I")] <- NA #create multiple empty columns
@@ -88,7 +87,7 @@ df[c("E","F","G","H","I")] <- NA #create multiple empty columns
 
 ### Merge Data Frames by Variable
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 data <- merge(d1, d2, by="Patient.ID")
 ```
 
@@ -98,7 +97,7 @@ data <- merge(d1, d2, by="Patient.ID")
 
 ### Change Order of Factor Levels 
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 pc$Group <- factor(pc$Group, levels = c('Control','Case'),ordered = TRUE)
 ```
 
@@ -114,12 +113,12 @@ Use cases:
 [Categorize continuous data](https://stackoverflow.com/questions/40380112/categorize-continuous-variable-with-dplyr)
 
 With [`cut`](https://www.rdocumentation.org/packages/base/versions/3.4.3/topics/cut)
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 df$category <- cut(df$a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("low","middle","high"))
 ```
 
 With [`dplyr`](http://dplyr.tidyverse.org/reference/mutate.html)
-```{r}
+```{r, eval=FALSE, echo=TRUE}
 res <- df %>% mutate(category=cut(a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("low","middle","high")))
 ```
 
@@ -134,7 +133,7 @@ res <- df %>% mutate(category=cut(a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("lo
 - [`select()` - R4DS ](http://r4ds.had.co.nz/transform.html#select-columns-with-select)
 - [`select()` - Tidyverse ](http://dplyr.tidyverse.org/reference/select.html)
 
-```{r select}
+```{r select, eval=FALSE, echo=TRUE}
 > names(chicago)[1:3]
 [1] "city" "tmpd" "dptp"
 > subset <- select(chicago, city:dptp)
@@ -160,18 +159,20 @@ mpg_summary <- mpg %>%
   group_by(class) %>% # group by grouping variable class
   summarize(hwy_sd = sd(hwy), hwy_mean = mean(hwy)) %>% # find the sd and se of the mean
   mutate(hwy_se = hwy_sd/sqrt(length(mpg$hwy))) # add the standard error of the mean
+
+mpg_summary
 ```
 
 
 ### `summaryBy` (Base R)
-```{r summaryBy}
+```{r summaryBy, eval=FALSE, echo=TRUE}
 summaryBy(Age ~ med_year, data = data, FUN = function(x) { c(m = mean(x, na.rm=TRUE), s = sd(x, na.rm=TRUE), n =length(x), r=range(x,na.rm=TRUE)) }
           
 ```
 	
 ### Summarize with `psych( )` package
 
-```{r summaryPsych}
+```{r summaryPsych, eval=FALSE, echo=TRUE}
 library(psych)
 describeBy(my_data, my_data$Group, mat=T)
 ```
@@ -217,7 +218,7 @@ And from [socviz](http://socviz.co/makeplot.html#build-your-plots-layer-by-layer
 
 - Take the data and add a `geom_histogram` layer with `aes()` set to the variable you're interested in.
 
-```{r basic ggplot2 histogram, eval=TRUE, echo=TRUE}
+```{r, basic ggplot2 histogram, eval=TRUE, echo=TRUE}
 ggplot(mtcars) + geom_histogram(aes(mpg), binwidth = 5)
 ```
 
@@ -227,7 +228,7 @@ ggplot(mtcars) + geom_histogram(aes(mpg), binwidth = 5)
 - Take a dataset. Make a histogram, use `aes()` for the variable of interest. Add another `geom_hist()` layer doing the same. You can change `binwidth` and `alpha`
 
 
-```{r Overlaid Histograms, eval=TRUE, echo=TRUE}
+```{r, Overlaid Histograms, eval=TRUE, echo=TRUE}
 ggplot(mtcars) + geom_histogram(aes(disp), fill="red", alpha=0.2, binwidth = 50)  + geom_histogram(aes(hp), fill="blue", alpha=0.2, binwidth = 50)
 
 ```
@@ -249,7 +250,7 @@ For Categorical x Categorical Data (Contingency Table)
 
 [`ggmosiac` package](https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html)
 
-```{r Mosaic Plot Function, eval=TRUE, echo=TRUE}
+```{r Mosaic Plot Function}
 
 library(ggmosaic)
 library(NHANES)
@@ -277,6 +278,8 @@ p = ggplot(mpg, aes(x=class, y=hwy)) + geom_bar(stat="summary", fun.y="mean") + 
 
 #add error bars
 p + geom_errorbar(data=mpg_summary, aes(x=class, y=hwy_sd, ymin=hwy_mean-hwy_sd, ymax = hwy_mean+ hwy_sd))
+
+p
 
 ```
 
