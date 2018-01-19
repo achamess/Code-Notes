@@ -1,0 +1,98 @@
+---
+title: "R code snippets"
+output: html_notebook
+---
+
+# R Code Snippets 
+tags: #r #code 
+
+## Basic 
+
+Importing datasets
+
+``` {r}
+mydata <- read.delim("cyto_pheno_merged_v1.txt", header=TRUE, na.strings="NA")
+```
+    
+Writing to a file
+	
+``` {r}
+#tab delimitted text file
+write.table(cyto_all, "cyto_all_clean_v1.txt", sep="\t")
+```	
+	
+Merge tables
+
+    data <- merge(pcr,pheno, by="Patient.ID")
+
+Change Order of Factor Levels 
+
+    pc$Group <- factor(pc$Group, levels = c('Control','Case'),ordered = TRUE)
+    
+[ Importing Multiple CSV files at once](http://stackoverflow.com/questions/11433432/importing-multiple-csv-files-into-r)
+ 
+ 	temp = list.files(pattern="*.csv")
+	for (i in 1:length(temp)) assign(temp[i], read.csv(temp[i]))   
+    
+
+## Subsetting
+
+### Using `dplyr` package
+
+`select()`
+
+>“The select() function can be used to select columns of a data frame that you want to focus on. Often you’ll have a large data frame containing “all” of the data, but any given analysis might only use a subset of variables or observations. The select() function allows you to get the few columns you might need.” - Excerpt From: Roger D. Peng. “R Programming for Data Science.” iBooks. 
+
+Example of `select()`
+
+```
+> names(chicago)[1:3]
+[1] "city" "tmpd" "dptp"
+> subset <- select(chicago, city:dptp)
+> head(subset)
+  city tmpd   dptp
+1 chic 31.5 31.500
+2 chic 33.0 29.875
+3 chic 33.0 27.375
+4 chic 29.0 28.625
+5 chic 32.0 28.875
+6 chic 40.0 35.125
+```
+
+    
+## Summarizing Data
+
+### Summary Statistics
+
+	summaryBy(Age ~ med_year, data = data, FUN = function(x) { c(m = mean(x, na.rm=TRUE), s = sd(x, na.rm=TRUE), n =length(x), r=range(x,na.rm=TRUE)) }
+	
+Using the psych( ) package
+
+    	library(psych)
+	describeBy(cyto_all, cyto_all$Group, mat=T)
+	
+	
+## Useful stuff
+
+[Remove objects by search term](http://stackoverflow.com/questions/11624885/remove-multiple-objects-with-rm)
+
+	rm(list=ls(pattern="temp"))
+	
+[Make a list of data frames based on naming pattern](http://stackoverflow.com/questions/17499013/how-do-i-make-a-list-of-data-frames)
+
+	df_list = mget(ls(pattern = "df[0-9]"))
+	# this would match any object with "df" followed by a digit in its name
+	# you can test what objects will be got by just running the
+	ls(pattern = "df[0-9]")
+	# part and adjusting the pattern until it gets the right objects.
+	
+Note: The critical piece here is `mget()` which calls the value of a named object 
+
+[Filter a list by class of list item](http://stackoverflow.com/questions/36661704/filter-values-of-a-list-in-r)
+
+	Filter(function(x) is(x, "data.frame"), mget(ls(pattern="_list"))) 
+	
+	
+	
+	
+	

@@ -1,0 +1,389 @@
+---
+title: My R Code Notes
+output: 
+  html_notebook:
+    toc: yes
+    toc_float: TRUE
+---
+
+tags= #r_code #ggplot2 #data_science 
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',eval=FALSE, warning=FALSE, message=FALSE, echo=TRUE)
+```
+
+```{r}
+library(tidyverse)
+
+```
+
+# Getting and Writing Data
+
+## Importing Data
+
+### Tab Delimited Text
+``` {r import table delimited text}
+mydata <- read.delim("my_data.txt", header=TRUE, na.strings="NA")
+```
+
+### Importing Multiple CSV files at once
+
+[Stack Overflow - Importing Multiple CSV files in R](http://stackoverflow.com/questions/11433432/importing-multiple-csv-files-into-r)
+
+```{r}
+temp = list.files(pattern="*.csv")
+for (i in 1:length(temp)) assign(temp[i], read.csv(temp[i]))   
+```
+
+## Writing Out
+
+### Write out a tab delimited text
+	
+``` {r}
+#tab delimitted text file
+write.table(my_data, "my_data_output", sep="\t")
+```	
+
+
+# Wrangling
+
+***
+
+## Data Frames
+
+### Remove Columns
+
+[Remove an entire column from a data.frame in R
+](https://stackoverflow.com/questions/6286313/remove-an-entire-column-from-a-data-frame-in-r)
+
+Remove a column
+```{r}
+> Data$genome <- NULL
+> head(Data)
+   chr region
+1 chr1    CDS
+2 chr1   exon
+3 chr1    CDS
+4 chr1   exon
+5 chr1    CDS
+6 chr1   exon
+```
+
+Remove multiple columns
+```{r}
+Data[1:2] <- list(NULL)  # Marek
+Data[1:2] <- NULL        # does not work!
+```
+
+### Add columns to data frame 
+
+[Adding a New Column to a Data Frame](https://lembra.wordpress.com/2010/03/12/adding-new-column-to-a-data-frame-in-r/)
+```{r Create Empty Column in df}
+
+df["MY_NEW_COLUMN"] <- NA # That creates the new column named "MY_NEW_COLUMN" filled with "NA"
+df[c("E","F","G","H","I")] <- NA #create multiple empty columns
+```
+
+
+
+### Merge Data Frames by Variable
+
+```{r}
+data <- merge(d1, d2, by="Patient.ID")
+```
+
+***
+
+## Factors and Categories
+
+### Change Order of Factor Levels 
+
+```{r}
+pc$Group <- factor(pc$Group, levels = c('Control','Case'),ordered = TRUE)
+```
+
+
+### Categorizing Continuous Data 
+
+Purpose: When you want take numerical values and bin them into categories.
+
+Use cases:  
+
+- I have expression values of ISH puncta inside cells. I want to categorize expression levels into discrete categories (high, medium, low).
+
+[Categorize continuous data](https://stackoverflow.com/questions/40380112/categorize-continuous-variable-with-dplyr)
+
+With [`cut`](https://www.rdocumentation.org/packages/base/versions/3.4.3/topics/cut)
+```{r}
+df$category <- cut(df$a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("low","middle","high"))
+```
+
+With [`dplyr`](http://dplyr.tidyverse.org/reference/mutate.html)
+```{r}
+res <- df %>% mutate(category=cut(a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("low","middle","high")))
+```
+
+***
+
+## Subsetting
+
+### `select()` from `dplyr()`
+
+>“The select() function can be used to select columns of a data frame that you want to focus on. Often you’ll have a large data frame containing “all” of the data, but any given analysis might only use a subset of variables or observations. The select() function allows you to get the few columns you might need.” - Excerpt From: Roger D. Peng. “R Programming for Data Science.” iBooks. 
+
+- [`select()` - R4DS ](http://r4ds.had.co.nz/transform.html#select-columns-with-select)
+- [`select()` - Tidyverse ](http://dplyr.tidyverse.org/reference/select.html)
+
+```{r select}
+> names(chicago)[1:3]
+[1] "city" "tmpd" "dptp"
+> subset <- select(chicago, city:dptp)
+> head(subset)
+  city tmpd   dptp
+1 chic 31.5 31.500
+2 chic 33.0 29.875
+3 chic 33.0 27.375
+4 chic 29.0 28.625
+5 chic 32.0 28.875
+6 chic 40.0 35.125
+
+```
+
+# Describing Data
+
+## Summary Statistics
+
+### `summaryBy` (Base R)
+```{r summaryBy}
+summaryBy(Age ~ med_year, data = data, FUN = function(x) { c(m = mean(x, na.rm=TRUE), s = sd(x, na.rm=TRUE), n =length(x), r=range(x,na.rm=TRUE)) }
+          
+```
+	
+### Summarize with `psych( )` package
+
+```{r summaryPsych}
+library(psych)
+describeBy(my_data, my_data$Group, mat=T)
+```
+
+***
+This is a running notebook of stuff that I find useful in R, code that I use, lessons I learn. 
+
+# Visualize
+
+## ggplot2
+
+ggplot2 is a package that is used to make attractive and flexible plots. It's based on the idea of graphics composed of various layers.
+
+> Our new template takes seven parameters, the bracketed words that appear in the template. In practice, you rarely need to supply all seven parameters to make a graph because ggplot2 will provide useful defaults for everything except the data, the mappings, and the geom function.
+
+> The seven parameters in the template compose the grammar of graphics, a formal system for building plots. The grammar of graphics is based on the insight that you can uniquely describe any plot as a combination of a dataset, a geom, a set of mappings, a stat, a position adjustment, a coordinate system, and a faceting scheme. (http://r4ds.had.co.nz/data-visualisation.html#first-steps)
+
+```
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(
+     mapping = aes(<MAPPINGS>),
+     stat = <STAT>, 
+     position = <POSITION>
+  ) +
+  <COORDINATE_FUNCTION> +
+  <FACET_FUNCTION>
+```
+
+And from [socviz](http://socviz.co/makeplot.html#build-your-plots-layer-by-layer)
+
+>
+- Tell the ggplot() function what our data is.The data = … step.
+- Tell ggplot() what relationships we want to see.The  mapping = aes(…) step. For convenience we will put the results of the first two steps in an object called p.
+- Tell ggplot how we want to see the relationships in our data.Choose a geom.
+- Layer on geoms as needed, by adding them to the p object one at a time.
+- Use The scale_, family, labs() and guides() functions. some additional functions to adjust scales, labels, tick marks, titles. We’ll learn more about some of these functions shortly.
+
+***
+
+## Histograms
+
+### Basic Histogram (ggplot2)
+
+- Take the data and add a `geom_histogram` layer with `aes()` set to the variable you're interested in.
+
+```{r basic ggplot2 histogram, eval=TRUE, echo=TRUE}
+ggplot(mtcars) + geom_histogram(aes(mpg), binwidth = 5)
+```
+
+
+### Two histograms overlaid (ggplot2)
+
+- Take a dataset. Make a histogram, use `aes()` for the variable of interest. Add another `geom_hist()` layer doing the same. You can change `binwidth` and `alpha`
+
+
+```{r Overlaid Histograms, eval=TRUE, echo=TRUE}
+ggplot(mtcars) + geom_histogram(aes(disp), fill="red", alpha=0.2, binwidth = 50)  + geom_histogram(aes(hp), fill="blue", alpha=0.2, binwidth = 50)
+
+```
+
+***
+## Scatter Plots
+
+```{r, eval=TRUE, echo=TRUE}
+#using ggplot2
+
+ggplot(mtcars) + geom_point(aes(x = mpg, y = disp, color= mpg >25))
+
+
+```
+
+## Mosaic Plot
+
+For Categorical x Categorical Data (Contingency Table)
+
+[`ggmosiac` package](https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html)
+
+```{r Mosaic Plot Function, eval=TRUE, echo=TRUE}
+
+library(ggmosaic)
+library(NHANES)
+ ggplot(data = NHANES) +
+   geom_mosaic(aes(weight = Weight, x = product(SleepHrsNight, AgeDecade), fill=factor(SleepHrsNight)), na.rm=TRUE) +    theme(axis.text.x=element_text(angle=-25, hjust= .1)) + labs(x="Age in Decades ", title='f(SleepHrsNight | AgeDecade) f(AgeDecade)') + guides(fill=guide_legend(title = "SleepHrsNight", reverse = TRUE))
+```
+
+## Bar Plots
+
+### Basic Bar Plot with Overlaid Points
+
+- Each geom is a layer. To get the mean of the data_points, no conversion is necessary. You can use the `stat=summary` argument. Error bars, however, must be calculated and entered into the data. 
+
+[Plotting means and error bars - R Cookbook](http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/)
+
+```{r bar plots means and error bars, eval=TRUE}
+#get summary statistics
+mpg_summary <- mpg %>%
+  group_by(class) %>% # group by grouping variable class
+  summarize(hwy_sd = sd(hwy), hwy_mean = mean(hwy)) %>% # find the sd and se of the mean
+  mutate(hwy_se = hwy_sd/sqrt(length(mpg$hwy))) # add the standard error of the mean
+
+#build base bar plot  
+p = ggplot(mpg, aes(x=class, y=hwy)) + geom_bar(stat="summary", fun.y="mean") + geom_jitter(aes(color=factor(year))) 
+
+#add error bars
+p + geom_errorbar(data=mpg_summary, aes(x=class, y=hwy_sd, ymin=hwy_mean-hwy_sd, ymax = hwy_mean+ hwy_sd))
+
+```
+
+```{r}
+
+```
+
+
+## Arranging Plots
+
+[Side by Side ggplot2 plots](https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2)
+
+```{r side by side ggplot2 plots, eval=TRUE, echo=TRUE}
+
+require(gridExtra)
+plot1 <- qplot(mtcars$mpg)
+plot2 <- qplot(mtcars$disp)
+grid.arrange(plot1, plot2, ncol=2)
+
+```
+
+
+***
+
+# Genomic Analysis
+
+## Volcano Plot
+
+[Volcano Plots with DESeq2](https://twbattaglia.github.io/2016/12/17/volcano-plot/)
+
+```{r eval=FALSE}
+simple <- ggplot(df, aes(x = lfc, y = pvalue)) + 
+  geom_point(size = 3, alpha = 0.7, na.rm = T) + # Make dots bigger
+  theme_bw(base_size = 16) + # change theme
+  ggtitle(label = "Volcano Plot", subtitle = "Simple black & white") + # Add a title
+  xlab(expression(log[2]("Treatment" / "Untreated"))) + # x-axis label
+  ylab(expression(-log[10]("adjusted p-value"))) + # y-axis label
+  geom_vline(xintercept = c(-2,2), colour = "darkgrey") + # Add cutoffs
+  geom_hline(yintercept = 1.3, colour = "darkgrey") + # Add cutoffs
+  geom_vline(xintercept = 0, colour = "black") + # Add 0 lines
+  scale_colour_gradient(low = "black", high = "black", guide = FALSE) + # Color black
+  scale_x_continuous(limits = c(-4, 4)) # min/max of lfc
+
+# Plot figure
+simple
+
+```
+
+Color can be added like this.
+
+```{r eval=FALSE}
+# Modify dataset to add new coloumn of colors
+
+data <- data %>%
+  mutate(color = ifelse(data$lfc > 0 & data$pvalue > 1.3, 
+                        yes = "Treated", 
+                        no = ifelse(data$lfc < 0 & data$pvalue > 1.3, 
+                                    yes = "Untreated", 
+                                    no = "none")))
+
+# Color corresponds to fold change directionality
+colored <- ggplot(data, aes(x = lfc, y = pvalue)) + 
+  geom_point(aes(color = factor(color)), size = 1.75, alpha = 0.8, na.rm = T) + # add gene points
+  theme_bw(base_size = 16) + # clean up theme
+  theme(legend.position = "none") + # remove legend 
+  ggtitle(label = "Volcano Plot", subtitle = "Colored by directionality") +  # add title
+  xlab(expression(log[2]("Treated" / "Untreated"))) + # x-axis label
+  ylab(expression(-log[10]("adjusted p-value"))) + # y-axis label
+  geom_vline(xintercept = 0, colour = "black") + # add line at 0
+  geom_hline(yintercept = 1.3, colour = "black") + # p(0.05) = 1.3
+  annotate(geom = "text", 
+           label = "Untreated", 
+           x = -2, y = 85, 
+           size = 7, colour = "black") + # add Untreated text
+  annotate(geom = "text", 
+           label = "Treated", 
+           x = 2, y = 85, 
+           size = 7, colour = "black") + # add Treated text
+  scale_color_manual(values = c("Treated" = "#E64B35", 
+                                "Untreated" = "#3182bd", 
+                                "none" = "#636363")) # change colors
+  
+# Plot figure
+colored
+```
+
+***
+# Miscellaneous
+
+[Remove objects by search term](http://stackoverflow.com/questions/11624885/remove-multiple-objects-with-rm)
+
+	rm(list=ls(pattern="temp"))
+	
+[Make a list of data frames based on naming pattern](http://stackoverflow.com/questions/17499013/how-do-i-make-a-list-of-data-frames)
+
+	df_list = mget(ls(pattern = "df[0-9]"))
+	# this would match any object with "df" followed by a digit in its name
+	# you can test what objects will be got by just running the
+	ls(pattern = "df[0-9]")
+	# part and adjusting the pattern until it gets the right objects.
+	
+Note: The critical piece here is `mget()` which calls the value of a named object 
+
+[Filter a list by class of list item](http://stackoverflow.com/questions/36661704/filter-values-of-a-list-in-r)
+
+	Filter(function(x) is(x, "data.frame"), mget(ls(pattern="_list"))) 
+
+## Sequence Generation
+
+### Binary (0,1) Random Collection
+
+[Make binary vector with 0,1](https://stackoverflow.com/questions/26137662/r-generate-number-vector-only-contains-0-and-1-with-certain-length)
+
+```{r eval=TRUE}
+X <- 10 
+sample(c(0,1), replace=TRUE, size=X)
+```
+
+
+***

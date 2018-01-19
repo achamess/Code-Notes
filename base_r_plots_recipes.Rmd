@@ -1,0 +1,60 @@
+---
+title: "base_r_plots_recipes"
+output: html_notebook
+---
+
+Histograms are useful for showing the frequency distribution of some data.
+
+## Basic Histograms
+
+```{r basic_hist}
+h1<-rnorm(1000,4)
+hist(h1)
+```
+
+**Expressing histograms with percentages rather than frequency**
+
+```{r hist_percent}
+h = hist(h1)
+h$density = h$counts/sum(h$counts)*100
+plot(h,freq=FALSE)
+```
+
+----
+## Overlapping Histograms
+
+Sometimes it's very useful to create two overlapping histograms in the same plots. 
+One way to do this is to use the plot function.
+
+_Source_: [Stack Overflow - How to plot two histograms together in R?](http://stackoverflow.com/questions/3541713/how-to-plot-two-histograms-together-in-r)
+
+```{r hist_overlap_1, fig.keep='last'}
+
+set.seed(42)
+p1 <- hist(rnorm(500,4))                     # centered at 4
+p2 <- hist(rnorm(500,6))                     # centered at 6
+plot( p1, col=rgb(0,0,1,1/4), xlim=c(0,10))  # first histogram
+plot( p2, col=rgb(1,0,0,1/4), xlim=c(0,10), add=T)  # second
+box()
+```
+
+In the above example, you can change the x and y lims. Also, the color scheme enables overlap to give purple. 
+
+To change the y axis to percentages rather than frequency, you first need to change the histogram, as described above. Also, you need to add the argument 
+
+    freq=FALSE
+
+```{r hist_overlap_percent, fig.keep='last'}
+
+set.seed(42)
+p1 <- rnorm(500,4)                  # centered at 4
+p2 <-rnorm(500,6)                     # centered at 6
+p1 = hist(p1)
+p1$density = p1$counts/sum(p1$counts)*100
+p2=hist(p2)
+p2$density = p2$counts/sum(p2$counts)*100
+
+plot( p1, col=rgb(0,0,1,1/4), ylim=c(0,30), xlim=c(0,10), freq=FALSE)  # first histogram
+plot( p2, col=rgb(1,0,0,1/4), ylim=c(0,30), xlim=c(0,10), freq=FALSE, add=T)  # second
+box()
+```

@@ -1,0 +1,37 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r eval=FALSE}
+install.packages("gcookbook")
+install.packages("tidyverse")
+
+source("https://bioconductor.org/biocLite.R")
+biocLite("Biobase")
+
+
+```
+
+```{r include libraries}
+library(tidyverse)
+library(gcookbook)
+library(Biobase)
+
+```
+
+## Bar Graphs
+
+### Basic Bar Graph
+Ref: R Graphics Cookbook (Chang), p20-21
+
+```{r}
+pg_mean
+ggplot(pg_mean, aes(x=group, y=weight)) + geom_bar(stat="identity")
+
+```
+
+### Grouping Bars Together 
+
+
+

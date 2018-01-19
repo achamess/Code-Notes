@@ -1,0 +1,27 @@
+---
+title: "ggplot2 recipes"
+output: html_notebook
+---
+# ggplot2 recipes
+tags = #r #code #r_plots
+
+```{r}
+library(ggplot2)
+```
+
+## Histograms
+
+### Basic Histogram
+
+``` {r }
+ggplot(data) + geom_histogram(aes(x))
+```
+
+### Two histograms overlaid
+
+- Take a dataset. Make a histogram, use `aes()` for the variable of interest. Add another `geom_hist()` layer doing the same. You can change `binwidth` and `alpha`
+
+
+``` {r Overlaid Histograms}
+ggplot(mtcars) + geom_histogram(aes(disp), fill="red", alpha=0.2, binwidth = 50)  + geom_histogram(aes(hp), fill="blue", alpha=0.2, binwidth = 50)
+```
