@@ -83,13 +83,33 @@ df["MY_NEW_COLUMN"] <- NA # That creates the new column named "MY_NEW_COLUMN" fi
 df[c("E","F","G","H","I")] <- NA #create multiple empty columns
 ```
 
-
+See also [Adding and Removing Columns - R Cookbook](http://www.cookbook-r.com/Manipulating_data/Adding_and_removing_columns_from_a_data_frame/)
 
 ### Merge Data Frames by Variable
 
 ```{r, echo=TRUE, eval=FALSE}
 data <- merge(d1, d2, by="Patient.ID")
 ```
+
+### Create multiple columns with different names and data
+[Adding multiple columns simultaneously with different values in R
+-SO](https://stackoverflow.com/questions/48351750/adding-multiple-columns-simultaneously-with-different-values-in-r/48351810#48351810)
+```{r, create columns with different names and values}
+library('tidyverse')
+
+df <- head(cars)
+
+mutate(df, Subject = 'F1', Slide = '1A')
+
+```
+
+### Merge multiple data frames using `merge_all()
+
+```{r, eval=FALSE, echo=TRUE}
+reshape::merge_all(your_list_with_dfs, ...)
+```
+
+
 
 ***
 
@@ -283,11 +303,6 @@ p
 
 ```
 
-```{r}
-
-```
-
-
 ## Arranging Plots
 
 [Side by Side ggplot2 plots](https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2)
@@ -366,6 +381,26 @@ colored <- ggplot(data, aes(x = lfc, y = pvalue)) +
 colored
 ```
 
+
+# Programming
+
+## For Loops
+
+### Assigning a new name to a variable each iteration with a for loop
+
+Goal: With each iteration of the `For()` loop, create a new variable that appends the iterator variable to the new variable. This is useful for creating objects as you go through a list or sequence. 
+
+- [Change variable name in `For()` loop](https://stackoverflow.com/questions/16566799/change-variable-name-in-for-loop-using-r)
+- [More on the `assign()` function](http://stat.ethz.ch/R-manual/R-patched/library/base/html/assign.html)
+
+```{r}
+for (i in seq(1,6)){
+ name <- paste("data", "_", i, sep = "")
+ assign(name, read_excel("Left_Female.xlsx", i))
+}
+```
+
+
 ***
 # Miscellaneous
 
@@ -398,5 +433,29 @@ X <- 10
 sample(c(0,1), replace=TRUE, size=X)
 ```
 
+## Annotate `geom_point` or other plot selectively using `annotate()`
+[ggplot XY scatter - how to change alpha transparency for select points?
+](https://stackoverflow.com/questions/32423167/ggplot-xy-scatter-how-to-change-alpha-transparency-for-select-points)
+```{r eval=FALSE, echo=TRUE}
+
+## you start here
+library(ggplot2)
+special.points <- sample(1:n, 7)
+## then add annotate text
+ggplot(df, aes(x=SeqIdentityMean,
+               y=SeqIdentityStdDev)) +
+  geom_point(alpha=0.05) +
+  annotate("point",
+           df$SeqIdentityMean[special.points],
+           df$SeqIdentityStdDev[special.points],
+           col="red") +
+  annotate("text",
+           df$SeqIdentityMean[special.points],
+           df$SeqIdentityStdDev[special.points],
+           #text we want to display
+           label=round(df$SeqIdentityStdDev[special.points],1),
+           #adjust horizontal position of text
+           hjust=-0.1)
+```
 
 ***
