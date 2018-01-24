@@ -249,7 +249,7 @@ ggplot(mtcars) + geom_histogram(aes(mpg), binwidth = 5)
 
 
 ```{r, Overlaid Histograms, eval=TRUE, echo=TRUE}
-ggplot(mtcars) + geom_histogram(aes(disp), fill="red", alpha=0.2, binwidth = 50)  + geom_histogram(aes(hp), fill="blue", alpha=0.2, binwidth = 50)
+ggplot(mtcars) + geom_histogram(aes(disp), fill="red", alpha=0.2, binwidth = 100)  + geom_histogram(aes(hp), fill="blue", alpha=0.2, binwidth = 100)
 
 ```
 
