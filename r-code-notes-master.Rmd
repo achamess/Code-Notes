@@ -1,9 +1,13 @@
 ---
-title: My R Code Notes
-output: 
+title: "My R Code Notes"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
   html_notebook:
     toc: yes
-    toc_float: TRUE
+    toc_float: yes
 ---
 
 tags= #r_code #ggplot2 #data_science 
@@ -38,10 +42,11 @@ for (i in 1:length(temp)) assign(temp[i], read.csv(temp[i]))
 
 ### Write out a tab delimited text
 	
-``` {r, eval=FALSE, echo=TRUE}
+```{r, eval=FALSE, echo=TRUE}
 #tab delimitted text file
 write.table(my_data, "my_data_output", sep="\t")
-```	
+```
+
 
 
 # Wrangling
@@ -85,6 +90,18 @@ df[c("E","F","G","H","I")] <- NA #create multiple empty columns
 
 See also [Adding and Removing Columns - R Cookbook](http://www.cookbook-r.com/Manipulating_data/Adding_and_removing_columns_from_a_data_frame/)
 
+
+### Add Group Information to Subjects
+
+When you want to put an observation into a group (e.g Case vs. Control), you need to create a new variable. A simple way to do this is to create a vector(s) that contains the Group members and then use `mutate` with `if_else()`.
+
+In this example, I created a group called "Domestic" for some cars based on their manufacturer variable.
+
+```{r eval=TRUE, echo=TRUE}
+domestic = c("chevrolet", "dodge", "ford", "jeep", "lincoln", "mercury", "pontiac")
+mutate(mpg, Location = if_else(manufacturer %in% domestic, "Domestic", "Foreign"))
+```
+
 ### Merge Data Frames by Variable
 
 ```{r, echo=TRUE, eval=FALSE}
@@ -108,8 +125,6 @@ mutate(df, Subject = 'F1', Slide = '1A')
 ```{r, eval=FALSE, echo=TRUE}
 reshape::merge_all(your_list_with_dfs, ...)
 ```
-
-
 
 ***
 
@@ -393,7 +408,7 @@ Goal: With each iteration of the `For()` loop, create a new variable that append
 - [Change variable name in `For()` loop](https://stackoverflow.com/questions/16566799/change-variable-name-in-for-loop-using-r)
 - [More on the `assign()` function](http://stat.ethz.ch/R-manual/R-patched/library/base/html/assign.html)
 
-```{r}
+```{r eval=FALSE, echo=TRUE}
 for (i in seq(1,6)){
  name <- paste("data", "_", i, sep = "")
  assign(name, read_excel("Left_Female.xlsx", i))
