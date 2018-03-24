@@ -1,11 +1,11 @@
 ---
 title: "My R Code Notes"
 output:
-  html_document:
-    df_print: paged
+  html_notebook:
     toc: yes
     toc_float: yes
-  html_notebook:
+  html_document:
+    df_print: paged
     toc: yes
     toc_float: yes
 ---
@@ -183,6 +183,25 @@ res <- df %>% mutate(category=cut(a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("lo
 
 ```
 
+# Functions
+
+## Assign the output of a function to the global environment
+You get some output from the function and you want it to be stored in the global environment so it can be used elsewhere. 
+
+From [SO](https://stackoverflow.com/questions/37558431/store-variables-from-a-function-in-the-global-environment):
+
+`assign()` or `<<-` can both be used. 
+
+> You could use assign:   
+
+> `assign("v","hi",envir = globalenv())`   
+
+>This requires that you have the name of the target global variable as a string, but it can be easy to do this even with a vector of dozens of such things.
+
+>This question discusses the differences between assign and <<-. The chief difference is that assign lets you specify the environment -- so it is easy to use it to store data in a non-global but persistent environment so that you could e.g. emulate static variables in R. While it is possible to use assign to modify the global environment, you should be aware that it is seldom a good thing to do so. There is too much of a danger of accidentally overwriting data that you don't want to have overwritten. Code which makes heavy use of global variables can almost always be refactored into cleaner code which doesn't. If you need to get a lot of heterogeneous data from a function to the calling environment, the cleanest solution would be to return the needed data in a list.
+
+
+
 # Describing Data
 
 ## Summary Statistics
@@ -190,6 +209,7 @@ res <- df %>% mutate(category=cut(a, breaks=c(-Inf, 0.5, 0.6, Inf), labels=c("lo
 ### `summarize()` from `dplyr`
 
 ```{r summarize with dplyr, eval=TRUE, echo=TRUE}
+
 mpg_summary <- mpg %>%
   group_by(class) %>% # group by grouping variable class
   summarize(hwy_sd = sd(hwy), hwy_mean = mean(hwy)) %>% # find the sd and se of the mean
@@ -212,8 +232,31 @@ library(psych)
 describeBy(my_data, my_data$Group, mat=T)
 ```
 
+### Counting number of values in a dataframe column
+
+Base R
+```{r, eval=F, echo=T}
+length(which(data_reshaped$Population=="Vglut1-ChR2"))
+```
+
+[`Tidyverse` way using `count()` or `tally()`](http://dplyr.tidyverse.org/reference/tally.html)
+
+```{r eval=F, echo=T}
+tally(x, wt, sort = FALSE)
+
+count(x, ..., wt = NULL, sort = FALSE)
+
+add_tally(x, wt, sort = FALSE)
+
+add_count(x, ..., wt = NULL, sort = FALSE)
+```
+
+
+
 ***
-This is a running notebook of stuff that I find useful in R, code that I use, lessons I learn. 
+
+
+
 
 # Visualize
 
@@ -301,7 +344,9 @@ library(NHANES)
 
 [Plotting means and error bars - R Cookbook](http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/)
 
+
 ```{r bar plots means and error bars, eval=TRUE}
+
 #get summary statistics
 mpg_summary <- mpg %>%
   group_by(class) %>% # group by grouping variable class
@@ -314,21 +359,20 @@ p = ggplot(mpg, aes(x=class, y=hwy)) + geom_bar(stat="summary", fun.y="mean") + 
 #add error bars
 p + geom_errorbar(data=mpg_summary, aes(x=class, y=hwy_sd, ymin=hwy_mean-hwy_sd, ymax = hwy_mean+ hwy_sd))
 
-p
-
 ```
+
+
+
 
 ## Arranging Plots
 
 [Side by Side ggplot2 plots](https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2)
 
 ```{r side by side ggplot2 plots, eval=TRUE, echo=TRUE}
-
 require(gridExtra)
 plot1 <- qplot(mtcars$mpg)
 plot2 <- qplot(mtcars$disp)
 grid.arrange(plot1, plot2, ncol=2)
-
 ```
 
 
@@ -437,6 +481,8 @@ Note: The critical piece here is `mget()` which calls the value of a named objec
 
 	Filter(function(x) is(x, "data.frame"), mget(ls(pattern="_list"))) 
 
+
+
 ## Sequence Generation
 
 ### Binary (0,1) Random Collection
@@ -473,4 +519,24 @@ ggplot(df, aes(x=SeqIdentityMean,
            hjust=-0.1)
 ```
 
-***
+
+### Labels in ggplot2
+
+Adding greek symbols
+[Special characters in labels](https://rstudio-pubs-static.s3.amazonaws.com/136237_170402e5f0b54561bf7605bdea98267a.html)
+
+```{r eval=F, echo=T}
+#for use with ggplot2
+labs(x = expression("Cross-sectional Area"*" ("*mu*"m"^{2}* ")"))   # microns. 
+```
+
+
+
+# Resources 
+
+- [`tidyr` tutorial](https://github.com/jtr13/codehelp/blob/master/R/gather.md)
+- [`R` for Data Science](http://r4ds.had.co.nz)
+- [Stat 545 - UBC](http://stat545.com/topics.html)
+- [R Cookbook](http://www.cookbook-r.com/Graphs/)
+- [ggplot - Computing for Social Sciences](http://cfss.uchicago.edu/lab03.html#how_to_remove_the_legend_and_change_the_legend_position)
+- [Creating Function - Software Carpentry](https://swcarpentry.github.io/r-novice-inflammation/02-func-R/)
