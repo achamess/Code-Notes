@@ -481,8 +481,7 @@ Note: The critical piece here is `mget()` which calls the value of a named objec
 
 	Filter(function(x) is(x, "data.frame"), mget(ls(pattern="_list"))) 
 
-
-
+This is cool.
 ## Sequence Generation
 
 ### Binary (0,1) Random Collection
